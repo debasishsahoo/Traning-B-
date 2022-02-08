@@ -103,3 +103,19 @@ function compareBy(propName) {
     }
 }
 
+let Products = [
+    { name: 'sumsung', price: 900 },
+    { name: 'iphone', price: 1500 },
+    { name: 'oneplus', price: 1000 },
+    { name: 'sony', price: 1300 }
+]
+console.log('Product Sorted By Name');
+Products.sort(compareBy('name'))
+console.table(Products)
+Products.sort()
+console.table(Products)
+
+console.log('Product Sorted By Price');
+Products.sort(compareBy('price'))
+console.table(Products)
+
