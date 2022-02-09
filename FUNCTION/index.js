@@ -1,17 +1,36 @@
-function add(a, b) {
-    return a + b
+// setTimeout(() => {
+//     console.log('5 Second Later');
+// }, 5000);
+// setInterval(() => { console.log('3 Second Later'); }
+//     , 3000)
+let Show = function () {
+    return ('Debasish');
 }
+let a = Show();
+console.log('a:', a)
 
-console.log(add(2, 4));
+//Callback
+let numbers = [1, 2, 4, 5, 7, 9, 3, 10, 6, 8]
+function isOddNumber(number) {
+    return number % 2;
+}
+let oddNumber = numbers.filter(isOddNumber);
+console.log(oddNumber);
 
-add = (function (a, b) {
-    return a + b
-})(10, 20)
 
-console.log(add);
 
-(function (a, b, c) {
-    console.log(a + b + c);
-})(10, 20, 30)
+// ES6
+oddNumber = numbers.filter(number => number % 2);
+console.log(oddNumber);
 
-//((a, b) => { console.log(a + b); })(10, 20);
+
+
+
+
+
+
+
+
+
+
+
