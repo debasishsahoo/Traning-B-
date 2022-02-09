@@ -10,7 +10,7 @@ let a = Show();
 console.log('a:', a)
 
 //Callback
-let numbers = [1, 2, 4, 5, 7, 9, 3, 10, 6, 8]
+let numbers = [1, 12, 4, 5, 7, 9, 3, 10, 6, 8]
 function isOddNumber(number) {
     return number % 2;
 }
@@ -22,6 +22,13 @@ console.log(oddNumber);
 // ES6
 oddNumber = numbers.filter(number => number % 2);
 console.log(oddNumber);
+
+//Sync Call Back
+
+let Short = numbers.sort((a, b) => a - b);
+console.log('Short:', Short)
+
+
 
 
 
