@@ -1,0 +1,1 @@
+const promise1 =Promise.res

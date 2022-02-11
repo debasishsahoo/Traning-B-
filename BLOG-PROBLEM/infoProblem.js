@@ -8,8 +8,6 @@ function GetFullName(fn) {
             }
         }, 2000)
     });
-
-
 }
 function GetHobbies(name) {
     return new Promise((resolve, reject) => {
@@ -39,7 +37,6 @@ function GetHobbies(name) {
 
         }, 4000)
     });
-
 }
 function GetHobbyDetails(hobby) {
     return new Promise((resolve, reject) => {
@@ -57,8 +54,30 @@ function GetHobbyDetails(hobby) {
             }
         }, 6000);
     })
-
 }
 
 
+async function Display() {
+    try {
+        console.time();
+        const Name = await GetFullName('Deb');
+        console.log('Name:', Name)
+        console.timeEnd();
+
+        console.time();
+        const Hobbies = await GetHobbies(Name);
+        console.log('Hobbies:', Hobbies)
+        console.timeEnd();
+
+        console.time();
+        const Details = await GetHobbyDetails(Hobbies);
+        console.log('Details:', Details)
+        console.timeEnd();
+    }
+    catch (err) {
+        console.log('err:', err)
+    }
+}
+
+Display()
 
