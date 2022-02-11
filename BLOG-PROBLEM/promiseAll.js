@@ -8,3 +8,11 @@ const promise3 = new Promise((resolve, reject) => {
 
 const promise4 = fetch('http://fakestoreapi.com/products')
     .then(res => res.json());
+
+
+console.time();
+Promise.all([promise1, promise2, promise3, promise4])
+    .then(value => {
+        console.log(value)
+    })
+console.timeEnd(); 
