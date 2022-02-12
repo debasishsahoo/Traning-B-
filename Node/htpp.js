@@ -11,7 +11,7 @@ const server = http.createServer((req, res) => {
         res.end('Cantact Page')
     }
     else if (req.url === '/blog') {
-        res.write('<ul><li>blog Page</li><li>blog1 Page</li><li>blog2 Page</li></ul>')
+        res.end('<ul><li>blog Page</li><li>blog1 Page</li><li>blog2 Page</li></ul>')
     }
     else {
         res.end('<h1>Opps!...Page Not Found</h1>')
