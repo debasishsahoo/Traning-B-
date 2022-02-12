@@ -15,12 +15,32 @@ const server = http.createServer((req, res) => {
         res.end()
     }
     else if (url === '/about') {
-        res.writeHead(200, { 'contentType': 'text/html' })
-        res.write('<h1>About Us</h1>')
+        res.writeHead(201, { 'contentType': 'text/html' })
+        res.write('<h2>About Us</h2>')
+        res.end()
+    }
+    else if (url === '/style') {
+        res.writeHead(201, { 'contentType': 'text/css' })
+        res.write(HomeStyle)
+        res.end()
+    }
+    else if (url === '/js') {
+        res.writeHead(201, { 'contentType': 'text/javascript' })
+        res.write(HomeJs)
+        res.end()
+    }
+    else if (url === '/svg') {
+        res.writeHead(201, { 'contentType': 'text/svg+xml' })
+        res.write(HomeSvg)
+        res.end()
+    }
+    else if (url === '/json') {
+        res.writeHead(201, { 'contentType': 'text/json' })
+        res.write(HomeJson)
         res.end()
     }
     else {
-        res.writeHead(404, { 'contentType': 'text/html' })
+        res.writeHead(404, { 'contentType': 'text/abir' })
         res.write('<h1>!.....Page not Found</h1>')
         res.end()
     }
