@@ -1,12 +1,7 @@
 const express = require('express');
-const { products, people } = require('./data/data')
-const logger = require('./middlewares/logger')
 const app = express();
-
+const { products, people } = require('./data/data')
 app.use(express.json())
-app.use(logger)
-
-
 
 
 app.get('/', (req, res) => {
@@ -23,7 +18,7 @@ app.get('/api/products', (req, res) => {
 
 app.get('/api/products/:id', (req, res) => {
     const id = req.params.id
-    // console.log('id:', id)
+    console.log('id:', id)
     const SingleProduct = products.find(
         (product) => product.id === Number(id)
     )
@@ -35,16 +30,19 @@ app.get('/api/products/:id', (req, res) => {
 
 app.get('/api/product/:pid/review/:rid', (req, res) => {
     const { pid, rid } = req.params
-    // console.log('rid:', rid)
-    // console.log('pid:', pid)
-    // console.log('req.params:', req.params)
+    console.log('rid:', rid)
+    console.log('pid:', pid)
+    console.log('req.params:', req.params)
     res.send('Hello World')
 })
 
 app.get('/api/product/query', (req, res) => {
     const { search, limit } = req.query
+    console.log('search:', search)
     //Act As root
     let SortedProducts = [...products]
+    console.log('SortedProducts:', SortedProducts)
+
     //http://localhost:5500/api/product/query/?search=a
     //http://localhost:5500/api/product/query/?search=a&limit=1
     //http://localhost:5500/api/product/query/?search=&limit=2
