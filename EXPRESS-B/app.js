@@ -1,13 +1,16 @@
 const express = require('express');
 const { products, people } = require('./data/data')
 const logger = require('./middlewares/logger')
+const morgan = require('morgan')
+const fs = require('fs')
 const app = express();
 
 app.use(express.json())
-app.use(logger)
 
-
-
+//app.use(logger)
+//app.use(morgan('tiny'))
+let accessLogStream = fs.createWriteStream('./log/access.log', { flags: 'a' })
+app.use(morgan('combined', { stream: accessLogStream }))
 
 app.get('/', (req, res) => {
     res.send('<h1>Home Page</h1><a href="/api/products">Products</a>')
@@ -43,7 +46,7 @@ app.get('/api/product/:pid/review/:rid', (req, res) => {
 
 app.get('/api/product/query', (req, res) => {
     const { search, limit, sort } = req.query
-    console.log('req.query:', req.query)
+    // console.log('req.query:', req.query)
     //Act As root
     let SortedProducts = [...products]
     //http://localhost:5500/api/product/query/?search=a
@@ -61,7 +64,7 @@ app.get('/api/product/query', (req, res) => {
     }
     if (sort === 'name') {
         //when we sort string data always use REGX
-        
+
         SortedProducts = SortedProducts.sort((x, y) => {
             let a = x.name.toUpperCase(), b = y.name.toUpperCase()
 
@@ -81,15 +84,5 @@ app.get('/api/product/query', (req, res) => {
 
 
 })
-
-
-
-// = is for Assign the Value
-// == Compare the Value only
-// === Compare the Value and Datatype
-
-// ==== Debasish
-
-
 
 app.listen(5500, () => { console.log('Server Connect http://127.0.0.1:5500'); })
