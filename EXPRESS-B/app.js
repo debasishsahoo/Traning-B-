@@ -85,4 +85,50 @@ app.get('/api/product/query', (req, res) => {
 
 })
 
+app.post('/', (req, res) => {
+    const { id, name, image, price, desc } = req.body
+    responseData = {
+        id: id,
+        name: name,
+        image: image,
+        price: price,
+        desc: desc
+    }
+    res.status(201).json({
+        allproduct: [...products, responseData]
+    })
+
+})
+app.put('/api/products/:id', (req, res) => {
+    const { id } = req.params
+    const { name } = req.body
+    const SingleProduct = products.find(e => e.id === Number(id))
+
+    if (!SingleProduct) {
+        return res.status(404).json('No product')
+    }
+
+    const newProducts = products.map(e => {
+        if (e.id === Number(id)) {
+            e.name = name
+        }
+        return e
+    })
+    return res.status(200).json(newProducts)
+
+})
+app.delete('/api/products/:id',)
+app.post('/login')
+
+
+
+
+
+
+
+
+
+
+
+
 app.listen(5500, () => { console.log('Server Connect http://127.0.0.1:5500'); })
