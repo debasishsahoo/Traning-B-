@@ -117,7 +117,22 @@ app.put('/api/products/:id', (req, res) => {
     return res.status(200).json(newProducts)
 
 })
-app.delete('/api/products/:id',)
+app.delete('/api/products/:id', (req, res) => {
+    const { id } = req.params
+    const SingleProduct = products.find(e => e.id === Number(id))
+    console.log('SingleProduct:', SingleProduct)
+
+    if (!SingleProduct) {
+        return res.status(404).json('No product')
+    }
+    const newProducts = products.filter(e => e.id !== Number(id))
+
+    return res.status(200).json(newProducts)
+
+
+
+
+})
 app.post('/login')
 
 
