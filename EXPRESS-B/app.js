@@ -42,7 +42,8 @@ app.get('/api/product/:pid/review/:rid', (req, res) => {
 })
 
 app.get('/api/product/query', (req, res) => {
-    const { search, limit } = req.query
+    const { search, limit, sort } = req.query
+    console.log('req.query:', req.query)
     //Act As root
     let SortedProducts = [...products]
     //http://localhost:5500/api/product/query/?search=a
@@ -58,9 +59,23 @@ app.get('/api/product/query', (req, res) => {
     if (limit) {
         SortedProducts = SortedProducts.slice(0, Number(limit))
     }
+    if (sort === 'name') {
+        //when we sort string data always use REGX
+        
+        SortedProducts = SortedProducts.sort((x, y) => {
+            let a = x.name.toUpperCase(), b = y.name.toUpperCase()
 
-
-
+            return a == b ? 0 : a > b ? 1 : -1
+        });
+    }
+    else if (sort === 'price') {
+        SortedProducts = SortedProducts.sort((x, y) => {
+            return y.price - x.price
+        });
+    }
+    else {
+        SortedProducts = SortedProducts.sort()
+    }
     res.status(200).json(SortedProducts)
 
 
