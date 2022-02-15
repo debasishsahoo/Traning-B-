@@ -1,6 +1,7 @@
 const express = require('express');
 const { products, people } = require('./data/data')
 const logger = require('./middlewares/logger')
+const auth = require('./middlewares/auth')
 const morgan = require('morgan')
 const fs = require('fs')
 const app = express();
@@ -10,7 +11,7 @@ app.use(express.json())
 //app.use(logger)
 //app.use(morgan('tiny'))
 let accessLogStream = fs.createWriteStream('./log/access.log', { flags: 'a' })
-app.use(morgan('combined', { stream: accessLogStream }))
+app.use([morgan('combined', { stream: accessLogStream }), auth])
 
 app.get('/', (req, res) => {
     res.send('<h1>Home Page</h1><a href="/api/products">Products</a>')
@@ -133,7 +134,11 @@ app.delete('/api/products/:id', (req, res) => {
 
 
 })
-app.post('/login')
+
+
+
+
+
 
 
 
