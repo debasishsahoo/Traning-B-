@@ -60,9 +60,6 @@ const deleteTask = AsyncWrapper(async (req, res) => {
     res.status(200).json({ success: true, message: 'Task Deleted', task: null })
 })
 
-
-
-
 module.exports = {
     getAllTask,
     createTask,

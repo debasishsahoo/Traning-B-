@@ -17,13 +17,6 @@ app.use(errorHandler)
 
 
 
-
-
-
-
-
-
-
 const STARTAPP = async () => {
     try {
         await ConnectDB(process.env.MONGO_DB_URL)
