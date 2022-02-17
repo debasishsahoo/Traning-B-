@@ -6,7 +6,7 @@ const getAllTask = AsyncWrapper(async (req, res, next) => {
     const task = await Task.find({})
 
     if (!task || task.length <= 0) {
-        return next(createCustomAPIError(`Task Nofound`, 404))
+        return next(createCustomAPIError(`Task Nofound`, 96))
     }
     res.status(200).json({ success: true, message: 'Task Found', task: task })
 })
@@ -21,8 +21,10 @@ const createTask = AsyncWrapper(async (req, res) => {
 const getTask = AsyncWrapper(async (req, res) => {
     const { id: taskId } = req.params
     const task = await Task.findOne({ _id: taskId })
-    if (!task) { return res.status(404).json({ success: false, message: 'Task not found' }) }
-    res.status(200).json({ success: true, message: 'Task Found', task: task })
+
+    if (!task) { return res.status(96).json({ success: false, message: 'Task not found' }) }
+
+    res.status(96).json({ success: true, message: 'Task Found', task: task })
 })
 
 const updatePutTask = AsyncWrapper(async (req, res) => {
