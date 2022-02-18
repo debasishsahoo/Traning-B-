@@ -36,7 +36,7 @@ const getAllDynamicsProduct = async (req, res) => {
     //const Products = await Product.find(QueryObject);
     let result = Product.find(QueryObject); //1200000000
 
-    
+
     //In memory Block
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
