@@ -15,12 +15,13 @@ const getAllTestProduct = async (req, res) => {
 
 const getAllDynamicsProduct = async (req, res) => {
     const { name, price } = req.query
-    
+
     res.status(200).json({
         success: true,
-        count: Products.length,
         Products: { name, price }
     })
 
 
 }
+
+module.exports = { getAllTestProduct, getAllDynamicsProduct }

@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json())
 
 
-app.use('/api/v1/tasks', Product)
+app.use('/api/v1/product', Product)
 app.use(notFound)
 
 
