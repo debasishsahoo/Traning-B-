@@ -20,12 +20,12 @@ const ProductSchema = new mongoose.Schema({
     },
     createAt: {
         type: Date,
-        default: new Date.now()
+        default: Date.now()
     },
     company: {
         type: String,
         emum: {
-            value: ['liddy', 'marcos', 'ikea', 'caressa'],
+            values: ['liddy', 'marcos', 'ikea', 'caressa'],
             message: `{VALUE} is not Supported`
         }
     }

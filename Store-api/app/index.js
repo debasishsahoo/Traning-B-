@@ -1,8 +1,8 @@
 const express = require('express');
 const ConnectDB = require('../db/connect')
-const Tasks = require('../routes/tasks.router')
+const Product = require('../routes/product.router')
 const notFound = require('../middlewares/notFound')
-const errorHandler = require('../middlewares/errorHandler')
+
 
 
 require('dotenv').config()
@@ -12,9 +12,9 @@ const app = express();
 app.use(express.json())
 
 
-app.use('/api/v1/tasks', Tasks)
+app.use('/api/v1/tasks', Product)
 app.use(notFound)
-app.use(errorHandler)
+
 
 
 
