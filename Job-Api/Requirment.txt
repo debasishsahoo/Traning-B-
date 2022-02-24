@@ -1,0 +1,7 @@
+npm i bcryptjs cors dotenv express mongoose morgan jsonwebtoken
+
+npm i nodemon -D
+
+npm i express-async-errors express-rate-limit helmet http-status-code joi rate-limiter xss-clean yamljs swagger-ui-express
+
+
