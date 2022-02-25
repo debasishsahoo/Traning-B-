@@ -41,10 +41,10 @@ app.use(cors());
 app.use(xss())
 
 //Doc Block
-// app.get('/', (req, res) => {
-//   res.send('<h1>Bank API</h1><a href="/api-docs">Testing Docs</a>')
-// })
-// app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoument))
+app.get('/', (req, res) => {
+  res.send('<h1>Bank API</h1><a href="/api-docs">Testing Docs</a>')
+})
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoument))
 
 
 
