@@ -23,7 +23,7 @@ const Customer = require("../routes/customer.router");
 const Employee = require("../routes/employee.router");
 
 //error Layer
-const notFound = require("../middlewares/notFound");
+const notFound = require("../error/notFound");
 const errorHandler = require("../middlewares/errorHandler");
 
 const PORT = process.env.PORT || 5500;

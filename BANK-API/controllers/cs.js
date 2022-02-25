@@ -1,5 +1,6 @@
 const Customer = require('../models/customer.model');
-const autoIdGenerator = require('../middlewares/autoIdGenerator');
+const CheckId = require('../middlewares/validId')
+
 const accountModel = require('../models/account.model');
 const {
     CustomAPIError,
@@ -9,7 +10,7 @@ const {
 } = require('../error');
 const { StatusCodes } = require('http-status-codes');
 
-const allCust = async (req, res) => {
+const GetAllCustomer = async (req, res) => {
     const customers = await Customer.find({}).sort('-createdAt');
     if (customers.length === 0) {
         throw new NotFoundError(`No Data Found`);
@@ -21,20 +22,15 @@ const allCust = async (req, res) => {
     });
 };
 
-const signUp = async (req, res) => {
+const CustomerRegistration = async (req, res) => {
     const {
         body: { name, email, contactNo, password },
     } = req;
     if (req.body.password === '' || req.body.email === '') {
         throw new BadRequestError('Please Provide proper Cred');
     }
-    req.body.cifNo = await autoIdGenerator();
-    req.body.password = await bcrypt.hash(req.body.password, 12);
-
     const customers = await Customer.create(req.body);
-
     //const account = await accountModel.create({});
-
     if (!customers) {
         throw new NotFoundError(`No Customer Found`)
     }
@@ -46,7 +42,7 @@ const signUp = async (req, res) => {
     });
 };
 
-const signIn = async (req, res) => {
+const CustomerLogin = async (req, res) => {
     const { body: { email, password } } = req;
     if (req.body.password === '' || req.body.email === '') {
         throw new BadRequestError('Please Provide proper Cred');
@@ -70,8 +66,19 @@ const signIn = async (req, res) => {
     });
 };
 
-const setCust = async (req, res) => {
-    const { id: custId } = req.params;
+const UpdateCustomerById = async (req, res) => {
+    const {
+        params: { id: custId },
+        body: { name, contactNo, }
+    } = req;
+
+    if (!CheckId(custId)) {
+        throw new BadRequestError('Please Provide valid Id');
+    }
+
+    if (req.body.name === '' || req.body.contactNo === '') {
+        throw new BadRequestError('Please Provide proper Cred');
+    }
 
     const customers = await Customer.findOneAndUpdate({ _id: custId }, req.body, {
         new: true,
@@ -80,13 +87,74 @@ const setCust = async (req, res) => {
     });
 
     if (!customers || customers.length <= 0) {
-        return res
-            .status(404)
-            .json({ success: false, message: 'Customer Id not found' });
+        throw new NotFoundError(`No Customer Found`)
     }
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
         success: true,
-        message: 'customer Updated',
+        message: `Customer Updated with id: ${customers._id} `,
+        customers: customers,
+    });
+};
+
+const GetCustomerById = async (req, res, next) => {
+    const { id } = req.params;
+    const customers = await Customer.findById(id);
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+    res.status(StatusCodes.OK).json({
+        success: true,
+        message: `Customer find with id ${customers._id}`,
+        customers: customers,
+    });
+};
+
+const DeleteCustomerById = async (req, res) => {
+    const { id: custId } = req.params;
+
+    if (!CheckId(custId)) {
+        throw new BadRequestError('Please Provide valid Id');
+    }
+
+    const customers = await Customer.findOneAndUpdate(
+        { _id: custId },
+        { isActive: 'deactive' },
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+
+    res.status(StatusCodes.GONE).json({
+        success: true,
+        message: `Customer Deleted with ${custId}`,
+        customers: customers,
+    });
+};
+
+const BlockCustomerById = async (req, res) => {
+    const { id: custId } = req.params;
+
+    const customers = await Customer.findOneAndUpdate(
+        { _id: custId },
+        { isActive: 'blocked' },
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+
+    res.status(StatusCodes.FORBIDDEN).json({
+        success: true,
+        message: `Customer Blocked with ${custId}`,
         customers: customers,
     });
 };

@@ -3,6 +3,7 @@ const Joi = require("joi");
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const autoIdGenerator = require('../middlewares/autoIdGenerator');
 
 const checkEmail = require("../middlewares/uniqueEmail");
 const checkPhone = require("../middlewares/uniquePhone");
@@ -21,13 +22,14 @@ const CustomerSchema = new mongoose.Schema(
   { timestamps: true }
 )
 CustomerSchema.pre('create', async function () {
-  
+
   const salt = await bcrypt.genSalt(Number(process.env.SECRET_KEY))
   this.password = await bcrypt.hash(this.password, salt)
+  this.CIF_No = await autoIdGenerator();
 
 })
 
-CustomerSchema.methods.createJWT = function () {
+CustomerSchema.methods.createJWT = async function () {
   return jwt.sign(
     { userId: this._id, name: this.name },
     process.env.EncKey,
@@ -36,7 +38,7 @@ CustomerSchema.methods.createJWT = function () {
 
 }
 
-CustomerSchema.methods.comparePassword = function (canditatePassword) {
+CustomerSchema.methods.comparePassword = async function (canditatePassword) {
   const isMatch = await bcrypt.compare(canditatePassword, this.password)
   return isMatch
 }
