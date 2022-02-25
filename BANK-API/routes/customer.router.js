@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  allCust,
-  signUp,
-  signIn,
-  getCust,
-  setCust,
-  delCust,
-  blockCust,
+  GetAllCustomer,
+  CustomerRegistration,
+  CustomerLogin,
+  UpdateCustomerById,
+  GetCustomerById,
+  DeleteCustomerById,
+  BlockCustomerById,
+  CustomerPasswordChange
 } = require("../controllers/customer.controller");
 
 // 1. Bank Customer
@@ -21,14 +22,15 @@ const {
 
 // without bank employee authorizing no Transaction can happened
 
-router.route("/").get(allCust);
+router.route("/").get(GetAllCustomer);
 
-router.route("/signup").post(signUp);
+router.route("/signup").post(CustomerRegistration);
 
-router.route("/signin").post(signIn);
+router.route("/signin").post(CustomerLogin);
 
-router.route("/:id").get(getCust).patch(setCust).delete(delCust);
+router.route("/:id").get(GetCustomerById).patch(UpdateCustomerById).delete(DeleteCustomerById);
 
-router.route("/block/:id").get(blockCust);
+router.route("/block/:id").get(BlockCustomerById);
+router.route("/:id/cif/:cif").patch(CustomerPasswordChange)
 
 module.exports = router;

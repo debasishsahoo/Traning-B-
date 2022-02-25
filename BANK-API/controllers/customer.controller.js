@@ -1,193 +1,206 @@
 const Customer = require('../models/customer.model');
-const asyncWrapper = require('../middlewares/asyncWrapper');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const autoIdGenerator = require('../middlewares/autoIdGenerator');
+const CheckId = require('../middlewares/validId')
+const CheckCIF = require('../middlewares/checkcif')
+
 const accountModel = require('../models/account.model');
-const errorHandler = require('../middlewares/errorHandler');
-const { CustomAPIError, UnauthenticatedError, NotFoundError, BadRequestError } = require('../error');
+const {
+    CustomAPIError,
+    UnauthenticatedError,
+    NotFoundError,
+    BadRequestError,
+} = require('../error');
 const { StatusCodes } = require('http-status-codes');
 
-const allCust = asyncWrapper(async (req, res) => {
-  const customers = await Customer.find({}).sort('-createdAt');
-  if (customers.length === 0) {
-    throw new NotFoundError(`No Data Found`)
-  }
-  res.status(StatusCodes.OK).json({
-    success: true,
-    count: customers.length,
-    customers: customers,
-  });
-});
-
-
-const signUp = asyncWrapper(async (req, res) => {
-  const {
-    body: { name, email, contactNo, password }
-  } = req;
-
-  if (req.body.password === '' || req.body.email === '') {
-    throw new BadRequestError('Please Provide proper Cred')
-  }
-
-  req.body.cifNo = await autoIdGenerator();
-  req.body.password = await bcrypt.hash(req.body.password, 12);
-
-  const customers = await Customer.create(req.body);
-
-  const account = await accountModel.create({});
-
-  // if (!account) {
-  //   throw new NotFoundError(`No Customer Found`)
-  // }
-
-  res.status(StatusCodes.CREATED).json({
-    success: true,
-    //message: `Customer Inserted with id: ${customers._id} `,
-    customers: req.body,
-  });
-});
-
-
-
-const signIn = asyncWrapper(async (req, res) => {
-  const { email, password } = req.body;
-  // console.log("hi");
-  const customers = await Customer.findOne({ email });
-  // console.log(customers);
-  if (!customers) {
-    return res
-      .status(400)
-      .json({ success: false, message: 'User dose not Exist' });
-  }
-  const isPasswordCorrect = await bcrypt.compare(password, customers.password);
-
-  if (!isPasswordCorrect) {
-    return res
-      .status(400)
-      .json({ success: false, message: 'invalid Password' });
-  }
-  const token = jwt.sign(
-    {
-      email: customers.email,
-      id: customers._id,
-      user_type: 'customer',
-    },
-    process.env.EncKey,
-    { expiresIn: 3600 }
-  );
-  res.status(201).json({
-    success: true,
-    message: 'Sucessfully login',
-    customers: customers,
-    token: token,
-    expiresIn: 3600,
-  });
-});
-// const getCust = asyncWrapper(async (req, res) => {
-//   const { id } = req.params;
-//   const customers = await Customer.findById(id);
-//   if (!customers) {
-//     return res
-//       .status(404)
-//       .json({ success: false, message: "Customer not found" });
-//   }
-//   res.status(200).json({
-//     success: true,
-//     message: `Customer find with id ${customers._id}`,
-//     customers: customers,
-//   });
-// });
-const setCust = asyncWrapper(async (req, res) => {
-  const { id: custId } = req.params;
-  const customers = await Customer.findOneAndUpdate({ _id: custId }, req.body, {
-    new: true,
-    runValidators: true,
-    // overwrite: true
-  });
-
-  if (!customers || customers.length <= 0) {
-    return res
-      .status(404)
-      .json({ success: false, message: 'Customer Id not found' });
-  }
-  res.status(200).json({
-    success: true,
-    message: 'customer Updated',
-    customers: customers,
-  });
-});
-const delCust = asyncWrapper(async (req, res) => {
-  const { id } = req.params;
-  const customers = await Customer.findOneAndUpdate(
-    { _id: id },
-    { isActive: 'deactive' },
-    {
-      new: true,
-      runValidators: true,
+const GetAllCustomer = async (req, res) => {
+    const customers = await Customer.find({}).sort('-createdAt');
+    if (customers.length === 0) {
+        throw new NotFoundError(`No Data Found`);
     }
-  );
-
-  if (!customers) {
-    return res.status(404).json({
-      success: false,
-      message: `Customer not found with ${id}`,
+    res.status(StatusCodes.OK).json({
+        success: true,
+        count: customers.length,
+        customers: customers,
     });
-  }
+};
 
-  res.status(200).json({
-    success: true,
-    message: 'Customer Deleted',
-    customers: customers,
-  });
-});
-const blockCust = asyncWrapper(async (req, res) => {
-  const { id } = req.params;
-  const customers = await Customer.findOneAndUpdate(
-    { _id: id },
-    { isActive: 'blocked' },
-    {
-      new: true,
-      runValidators: true,
+const CustomerRegistration = async (req, res) => {
+    const {
+        body: { name, email, contactNo, password },
+    } = req;
+    if (req.body.password === '' || req.body.email === '') {
+        throw new BadRequestError('Please Provide proper Cred');
     }
-  );
+    const customers = await Customer.create(req.body);
+    //const account = await accountModel.create({});
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
 
-  if (!customers) {
-    return res.status(404).json({
-      success: false,
-      message: `Customer not found with ${id}`,
+    res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: `Customer Inserted with id: ${customers._id} `,
+        customers: customers,
     });
-  }
+};
 
-  res.status(200).json({
-    success: true,
-    message: 'Customer Blocked',
-    customers: customers,
-  });
-});
+const CustomerLogin = async (req, res) => {
+    const { body: { email, password } } = req;
+    if (req.body.password === '' || req.body.email === '') {
+        throw new BadRequestError('Please Provide proper Cred');
+    }
+    const customers = await Customer.findOne(req.body.email);
+    if (!customers) {
+        throw new UnauthenticatedError('User dose not Exist')
+    }
+    const isPasswordCorrect = await customers.comparePassword(req.body.password);
 
-////////////////////////////////////////////////////////////////
-///////////////////////// THIS PART ////////////////////////////
-////////////////////////////////////////////////////////////////
-const getCust = asyncWrapper(async (req, res, next) => {
-  const { id } = req.params;
-  const customers = await Customer.findById(id);
-  if (!customers) {
-    return next(new CustomApiError(StatusCodes.NOT_FOUND));
-  }
-  res.status(200).json({
-    success: true,
-    message: `Customer find with id ${customers._id}`,
-    customers: customers,
-  });
-});
+    if (!isPasswordCorrect) {
+        throw new UnauthenticatedError('Invalid Password')
+    }
+    const token = customers.createJWT();
+
+    res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Sucessfully login',
+        customers: customers,
+        token: token
+    });
+};
+
+const UpdateCustomerById = async (req, res) => {
+    const {
+        params: { id: custId },
+        body: { name, contactNo, }
+    } = req;
+
+    if (!CheckId(custId)) {
+        throw new BadRequestError('Please Provide valid Id');
+    }
+
+    if (req.body.name === '' || req.body.contactNo === '') {
+        throw new BadRequestError('Please Provide proper Cred');
+    }
+
+    const customers = await Customer.findOneAndUpdate({ _id: custId }, req.body, {
+        new: true,
+        runValidators: true,
+        // overwrite: true
+    });
+
+    if (!customers || customers.length <= 0) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+    res.status(StatusCodes.OK).json({
+        success: true,
+        message: `Customer Updated with id: ${customers._id} `,
+        customers: customers,
+    });
+};
+
+const GetCustomerById = async (req, res, next) => {
+    const { id } = req.params;
+    const customers = await Customer.findById(id);
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+    res.status(StatusCodes.OK).json({
+        success: true,
+        message: `Customer find with id ${customers._id}`,
+        customers: customers,
+    });
+};
+
+const DeleteCustomerById = async (req, res) => {
+    const { id: custId } = req.params;
+
+    if (!CheckId(custId)) {
+        throw new BadRequestError('Please Provide valid Id');
+    }
+
+    const customers = await Customer.findOneAndUpdate(
+        { _id: custId },
+        { isActive: 'deactive' },
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+
+    res.status(StatusCodes.GONE).json({
+        success: true,
+        message: `Customer Deleted with ${custId}`,
+        customers: customers,
+    });
+};
+
+const BlockCustomerById = async (req, res) => {
+    const { id: custId } = req.params;
+
+    const customers = await Customer.findOneAndUpdate(
+        { _id: custId },
+        { isActive: 'blocked' },
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    if (!customers) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+
+    res.status(StatusCodes.FORBIDDEN).json({
+        success: true,
+        message: `Customer Blocked with ${custId}`,
+        customers: customers,
+    });
+};
+
+const CustomerPasswordChange = async (req, res) => {
+    const {
+        params: { id: custId },
+        cif: { cifno },
+        body: { email, password }
+    } = req
+
+    if (!CheckId(custId)) {
+        throw new BadRequestError('Please Provide valid Id');
+    }
+    if (!CheckCIF(cif)) {
+        throw new NotFoundError('Please Provide valid CIF');
+    }
+
+    if (req.body.email === '' || req.body.passowrd === '') {
+        throw new BadRequestError('Please Provide proper Cred');
+    }
+
+    const customers = await Customer.findByIdAndUpdate({ _id: custId }, req.body.password, {
+        new: true,
+        runValidators: true,
+        // overwrite: true
+    });
+    if (!customers || customers.length <= 0) {
+        throw new NotFoundError(`No Customer Found`)
+    }
+    res.status(StatusCodes.OK).json({
+        success: true,
+        message: `Customers Password Updated with id: ${customers._id} `,
+        customers: customers,
+    });
+}
+
 
 module.exports = {
-  allCust,
-  signUp,
-  signIn,
-  getCust,
-  setCust,
-  delCust,
-  blockCust,
-};
+    GetAllCustomer,
+    CustomerRegistration,
+    CustomerLogin,
+    UpdateCustomerById,
+    GetCustomerById,
+    DeleteCustomerById,
+    BlockCustomerById,
+    CustomerPasswordChange
+}

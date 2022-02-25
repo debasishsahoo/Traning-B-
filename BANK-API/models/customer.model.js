@@ -28,6 +28,13 @@ CustomerSchema.pre('create', async function () {
   this.CIF_No = await autoIdGenerator();
 
 })
+CustomerSchema.pre('findByIdAndUpdate', async function () {
+
+  const salt = await bcrypt.genSalt(Number(process.env.SECRET_KEY))
+  this.password = await bcrypt.hash(this.password, salt)
+
+
+})
 
 CustomerSchema.methods.createJWT = async function () {
   return jwt.sign(
