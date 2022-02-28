@@ -5,11 +5,11 @@ const checkAccount = require("../middlewares/uniqueAccountNumber");
 
 let AccountSchema = mongoose.Schema(
   {
-    CIF_No: Joi.string().alphanum().external(AutoId),
+    CIF_No: { type: Sting, ref: 'Customer' },
 
-    accountNumber: Joi.number().external(checkAccount),
+    accountNumber: Joi.string().external(checkAccount),
 
-    IFSC: Joi.string().alphanum(),
+    IFSC: Joi.string().alphanum().default("B0001"),
 
     accountBalance: Joi.number(),
 

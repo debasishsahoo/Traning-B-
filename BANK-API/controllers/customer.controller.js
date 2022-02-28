@@ -31,7 +31,10 @@ const CustomerRegistration = async (req, res) => {
         throw new BadRequestError('Please Provide proper Cred');
     }
     const customers = await Customer.create(req.body);
-    //const account = await accountModel.create({});
+
+    const account = await accountModel.create({});
+
+
     if (!customers) {
         throw new NotFoundError(`No Customer Found`)
     }

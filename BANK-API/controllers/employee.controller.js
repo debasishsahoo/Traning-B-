@@ -1,5 +1,4 @@
 const Employee = require("../models/employee.model");
-const Customer = require("../models/customer.model");
 const bcrypt = require("bcryptjs");
 const {
   CustomAPIError,
@@ -22,30 +21,30 @@ const GetAllEmployees = async (req, res) => {
   });
 };
 
-const signUp = async (req, res) => {
-  const { name, email, contactNo, password } = req.body;
-  // console.log();
-  const encPass = await bcrypt.hash(password, 12);
+// const signUp = async (req, res) => {
+//   const { name, email, contactNo, password } = req.body;
+//   // console.log();
+//   const encPass = await bcrypt.hash(password, 12);
 
-  const employee = await Employee.create({
-    name: name,
-    email: email,
-    contactNo: contactNo,
-    password: encPass,
-  });
+//   const employee = await Employee.create({
+//     name: name,
+//     email: email,
+//     contactNo: contactNo,
+//     password: encPass,
+//   });
 
-  if (!employee) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Employee not added" });
-  }
+//   if (!employee) {
+//     return res
+//       .status(404)
+//       .json({ success: false, message: "Employee not added" });
+//   }
 
-  res.status(201).json({
-    success: true,
-    message: `Employee Inserted with id: ${employee._id} `,
-    employee: employee,
-  });
-};
+//   res.status(201).json({
+//     success: true,
+//     message: `Employee Inserted with id: ${employee._id} `,
+//     employee: employee,
+//   });
+// };
 
 const EmployeeLogin = async (req, res) => {
   const { body: { email, password } } = req;
@@ -142,100 +141,6 @@ const DeleteEmployeeById = async (req, res) => {
 };
 
 
-
-const getAccountBalance = async (req, res) => {
-  const { customer_id } = req.params;
-  const { employee_id } = req.body;
-  const employee = await Employee.findOne({ _id: employee_id });
-  if (!employee || employee.length <= 0) {
-    return res.status(200).json({
-      success: false,
-      message: "Employee Not Matched",
-    });
-  }
-
-  const customerData = await Customer.findById({ _id: customer_id }).select({
-    name: 1,
-    accBalance: 1,
-    isActive: 1,
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "Ammount fatched",
-    customer_data: customerData,
-  });
-};
-
-const setAccountBalance = async (req, res) => {
-  const { customer_id } = req.params;
-  const { employee_id, amount } = req.body;
-  const employee = await Employee.findOne({ _id: employee_id });
-  if (!employee || employee.length <= 0) {
-    return res.status(200).json({
-      success: false,
-      message: "Employee Not Matched",
-    });
-  }
-
-  const customerData = await Customer.findByIdAndUpdate(
-    { _id: customer_id },
-    { accBalance: amount },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  return res.status(200).json({
-    success: true,
-    message: "Ammount fatched",
-    customer_data: customerData,
-  });
-};
-
-const getAccountStatus = async (req, res) => {
-  const { customer_id } = req.params;
-
-  const customerData = await Customer.findById({ _id: customer_id }).select({
-    name: 1,
-    isActive: 1,
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "Status fatched",
-    customer_data: customerData,
-  });
-};
-
-const setAccountStatus = async (req, res) => {
-  const { customer_id } = req.params;
-
-  const { employee_id, status } = req.body;
-  const employee = await Employee.findOne({ _id: employee_id });
-  if (!employee || employee.length <= 0) {
-    return res.status(200).json({
-      success: false,
-      message: "Employee Not Matched",
-    });
-  }
-
-  const customerData = await Customer.findByIdAndUpdate(
-    { _id: customer_id },
-    { isActive: status },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  return res.status(200).json({
-    success: true,
-    message: "Status fatched",
-    customer_data: customerData,
-  });
-};
 
 module.exports = {
   GetAllEmployees,
