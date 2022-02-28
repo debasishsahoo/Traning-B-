@@ -1,7 +1,6 @@
 const Employee = require("../models/employee.model");
 const Customer = require("../models/customer.model");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const {
   CustomAPIError,
   UnauthenticatedError,
@@ -10,7 +9,7 @@ const {
 } = require('../error');
 const { StatusCodes } = require('http-status-codes');
 
-const allEmployee = async (req, res) => {
+const GetAllEmployees = async (req, res) => {
   const employee = await Employee.find({}).sort('-createdAt');
 
   if (employee.length === 0) {
@@ -48,7 +47,7 @@ const signUp = async (req, res) => {
   });
 };
 
-const signIn = async (req, res) => {
+const EmployeeLogin = async (req, res) => {
   const { body: { email, password } } = req;
 
   if (req.body.password === '' || req.body.email === '') {
@@ -73,43 +72,57 @@ const signIn = async (req, res) => {
     token: token,
   });
 };
-const getEmployee = async (req, res) => {
+const GetEmployeeById = async (req, res) => {
   const { id } = req.params;
   const employee = await Employee.findById(id);
+
   if (!employee) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Employee not found" });
+    throw new NotFoundError(`No Employee Found`)
   }
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     success: true,
     message: `Employee find with id ${employee._id}`,
     employee: employee,
   });
 };
-const setEmployee = async (req, res) => {
-  const { id: custId } = req.params;
-  const employee = await Employee.findOneAndUpdate({ _id: custId }, req.body, {
+
+const UpdateEmployeeById = async (req, res) => {
+  const {
+    params: { id: empId },
+    body: { name, contactNo, }
+  } = req;
+
+  if (!CheckId(empId)) {
+    throw new BadRequestError('Please Provide valid Id');
+  }
+  if (req.body.name === '' || req.body.contactNo === '') {
+    throw new BadRequestError('Please Provide proper Cred');
+  }
+
+  const employee = await Employee.findOneAndUpdate({ _id: empId }, req.body, {
     new: true,
     runValidators: true,
     // overwrite: true
   });
 
   if (!employee || employee.length <= 0) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Employee Id not found" });
+    throw new NotFoundError(`No Employee Found`)
   }
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     success: true,
-    message: "Employee Updated",
+    message: `Emp Updated with id: ${employee._id} `,
     employee: employee,
   });
 };
-const delEmployee = async (req, res) => {
-  const { id } = req.params;
+
+const DeleteEmployeeById = async (req, res) => {
+  const { id: empId } = req.params;
+
+  if (!CheckId(empId)) {
+    throw new BadRequestError('Please Provide valid Id');
+  }
   const employee = await Employee.findOneAndUpdate(
-    { _id: id },
+    { _id: empId },
     { isActive: "deactive" },
     {
       new: true,
@@ -118,18 +131,17 @@ const delEmployee = async (req, res) => {
   );
 
   if (!employee) {
-    return res.status(404).json({
-      success: false,
-      message: `Employee not found with ${id}`,
-    });
+    throw new NotFoundError(`No Customer Found`)
   }
 
-  res.status(200).json({
+  res.status(StatusCodes.GONE).json({
     success: true,
-    message: "Employee Deleted",
+    message: `Employee Deleted ${empId}`,
     employee: employee,
   });
 };
+
+
 
 const getAccountBalance = async (req, res) => {
   const { customer_id } = req.params;
@@ -226,12 +238,12 @@ const setAccountStatus = async (req, res) => {
 };
 
 module.exports = {
-  allEmployee,
+  GetAllEmployees,
   signUp,
-  signIn,
-  getEmployee,
-  setEmployee,
-  delEmployee,
+  EmployeeLogin,
+  GetEmployeeById,
+  UpdateEmployeeById,
+  DeleteEmployeeById,
   getAccountBalance,
   setAccountBalance,
   getAccountStatus,
