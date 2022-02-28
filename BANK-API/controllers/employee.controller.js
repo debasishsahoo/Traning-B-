@@ -1,25 +1,29 @@
 const Employee = require("../models/employee.model");
 const Customer = require("../models/customer.model");
-const asyncWrapper = require("../middlewares/asyncWrapper");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {
+  CustomAPIError,
+  UnauthenticatedError,
+  NotFoundError,
+  BadRequestError,
+} = require('../error');
+const { StatusCodes } = require('http-status-codes');
 
-const allEmployee = asyncWrapper(async (req, res) => {
-  const employee = await Employee.find({});
+const allEmployee = async (req, res) => {
+  const employee = await Employee.find({}).sort('-createdAt');
 
   if (employee.length === 0) {
-    return res
-      .status(404)
-      .json({ success: false, message: "No employee Found" });
+    throw new NotFoundError(`No Emp Found`);
   }
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     success: true,
     count: employee.length,
     employee: employee,
   });
-});
+};
 
-const signUp = asyncWrapper(async (req, res) => {
+const signUp = async (req, res) => {
   const { name, email, contactNo, password } = req.body;
   // console.log();
   const encPass = await bcrypt.hash(password, 12);
@@ -42,43 +46,34 @@ const signUp = asyncWrapper(async (req, res) => {
     message: `Employee Inserted with id: ${employee._id} `,
     employee: employee,
   });
-});
+};
 
-const signIn = asyncWrapper(async (req, res) => {
-  const { email, password } = req.body;
-  // console.log("hi");
-  const employee = await Employee.findOne({ email });
-  // console.log(employee);
-  if (!employee) {
-    return res
-      .status(400)
-      .json({ success: false, message: "User dose not Exist" });
+const signIn = async (req, res) => {
+  const { body: { email, password } } = req;
+
+  if (req.body.password === '' || req.body.email === '') {
+    throw new BadRequestError('Please Provide proper Cred');
   }
-  const isPasswordCorrect = await bcrypt.compare(password, employee.password);
+  const employee = await Employee.findOne(req.body.email);
+
+  if (!employee) {
+    throw new UnauthenticatedError('Emp dose not Exist')
+  }
+  const isPasswordCorrect = await employee.comparePassword(req.body.password);
 
   if (!isPasswordCorrect) {
-    return res
-      .status(400)
-      .json({ success: false, message: "invalid Password" });
+    throw new UnauthenticatedError('Invalid Password')
   }
-  const token = jwt.sign(
-    {
-      email: employee.email,
-      id: employee._id,
-      user_type: "employee",
-    },
-    process.env.EncKey,
-    { expiresIn: 3600 }
-  );
-  res.status(201).json({
+  const token = employee.createJWT();
+
+  res.status(StatusCodes.OK).json({
     success: true,
     message: "Sucessfully login",
     employee: employee,
     token: token,
-    expiresIn: 3600,
   });
-});
-const getEmployee = asyncWrapper(async (req, res) => {
+};
+const getEmployee = async (req, res) => {
   const { id } = req.params;
   const employee = await Employee.findById(id);
   if (!employee) {
@@ -91,8 +86,8 @@ const getEmployee = asyncWrapper(async (req, res) => {
     message: `Employee find with id ${employee._id}`,
     employee: employee,
   });
-});
-const setEmployee = asyncWrapper(async (req, res) => {
+};
+const setEmployee = async (req, res) => {
   const { id: custId } = req.params;
   const employee = await Employee.findOneAndUpdate({ _id: custId }, req.body, {
     new: true,
@@ -110,8 +105,8 @@ const setEmployee = asyncWrapper(async (req, res) => {
     message: "Employee Updated",
     employee: employee,
   });
-});
-const delEmployee = asyncWrapper(async (req, res) => {
+};
+const delEmployee = async (req, res) => {
   const { id } = req.params;
   const employee = await Employee.findOneAndUpdate(
     { _id: id },
@@ -134,9 +129,9 @@ const delEmployee = asyncWrapper(async (req, res) => {
     message: "Employee Deleted",
     employee: employee,
   });
-});
+};
 
-const getAccountBalance = asyncWrapper(async (req, res) => {
+const getAccountBalance = async (req, res) => {
   const { customer_id } = req.params;
   const { employee_id } = req.body;
   const employee = await Employee.findOne({ _id: employee_id });
@@ -158,9 +153,9 @@ const getAccountBalance = asyncWrapper(async (req, res) => {
     message: "Ammount fatched",
     customer_data: customerData,
   });
-});
+};
 
-const setAccountBalance = asyncWrapper(async (req, res) => {
+const setAccountBalance = async (req, res) => {
   const { customer_id } = req.params;
   const { employee_id, amount } = req.body;
   const employee = await Employee.findOne({ _id: employee_id });
@@ -185,9 +180,9 @@ const setAccountBalance = asyncWrapper(async (req, res) => {
     message: "Ammount fatched",
     customer_data: customerData,
   });
-});
+};
 
-const getAccountStatus = asyncWrapper(async (req, res) => {
+const getAccountStatus = async (req, res) => {
   const { customer_id } = req.params;
 
   const customerData = await Customer.findById({ _id: customer_id }).select({
@@ -200,9 +195,9 @@ const getAccountStatus = asyncWrapper(async (req, res) => {
     message: "Status fatched",
     customer_data: customerData,
   });
-});
+};
 
-const setAccountStatus = asyncWrapper(async (req, res) => {
+const setAccountStatus = async (req, res) => {
   const { customer_id } = req.params;
 
   const { employee_id, status } = req.body;
@@ -228,7 +223,7 @@ const setAccountStatus = asyncWrapper(async (req, res) => {
     message: "Status fatched",
     customer_data: customerData,
   });
-});
+};
 
 module.exports = {
   allEmployee,
