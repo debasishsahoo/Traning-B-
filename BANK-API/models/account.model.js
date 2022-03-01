@@ -5,7 +5,7 @@ const checkAccount = require("../middlewares/uniqueAccountNumber");
 
 let AccountSchema = mongoose.Schema(
   {
-    CIF_No: { type: Sting, ref: 'Customer' },
+    CIF_No: { type: String, ref: 'Customer' },
 
     accountNumber: Joi.string().external(checkAccount),
 

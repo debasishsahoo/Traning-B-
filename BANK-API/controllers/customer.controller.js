@@ -32,9 +32,6 @@ const CustomerRegistration = async (req, res) => {
     }
     const customers = await Customer.create(req.body);
 
-    const account = await accountModel.create({});
-
-
     if (!customers) {
         throw new NotFoundError(`No Customer Found`)
     }

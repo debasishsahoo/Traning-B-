@@ -144,13 +144,8 @@ const DeleteEmployeeById = async (req, res) => {
 
 module.exports = {
   GetAllEmployees,
-  signUp,
   EmployeeLogin,
   GetEmployeeById,
   UpdateEmployeeById,
   DeleteEmployeeById,
-  getAccountBalance,
-  setAccountBalance,
-  getAccountStatus,
-  setAccountStatus,
 };
