@@ -30,4 +30,11 @@ const ProductSchema = new mongoose.Schema({
         }
     }
 })
-module.exports = mongoose.model('Product', ProductSchema)    
+module.exports = mongoose.model('Product', ProductSchema)  
+
+//mongoose.connection.on('connect')
+//mongoose.connection.on('error')
+//mongoose.connection.on('disconnect')
+
+//process.on('SIGINT')
+//AcessToken,refreshTOKEN

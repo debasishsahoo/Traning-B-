@@ -1,11 +1,12 @@
-const Customer = require("../models/customer.model");
+const Customer = require('../models/customer.model')
 
 const checkEmail = async (email) => {
-  const validEmail = await Customer.get({ email: email });
+  const validEmail = await Customer.find({ email: email });
 
-  if (!validEmail) {
-    throw new Error("email is already exist");
+  if (validEmail.length > 0) {
+    return true
   }
+  else return false
 };
 
 module.exports = checkEmail;

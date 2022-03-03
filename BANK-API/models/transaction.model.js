@@ -3,17 +3,15 @@ const Joi = require("joi");
 
 const TransactionSchema = new mongoose.Schema(
   {
-    sender: Joi.ObjectId().ref("Customer").required(),
+    sender: String,
 
-    receiver: Joi.ObjectId().ref("Customer").required(),
+    receiver: String,
 
-    amount: Joi.number().default(0),
+    amount: Number,
 
-    status: Joi.string()
-      .valid("failed", "success", "pending")
-      .default("pending"),
+    status: String,
 
-    createdAt: Joi.date().default(Date.now()),
+    createdAt: Date,
   },
   { timestamps: true }
 );

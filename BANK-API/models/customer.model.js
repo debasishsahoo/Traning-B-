@@ -1,12 +1,7 @@
-const mongoose = require('mongoose');
-const Joi = require('joi');
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const autoIdGenerator = require('../middlewares/autoIdGenerator');
-
-const checkEmail = require('../middlewares/uniqueEmail');
-const checkPhone = require('../middlewares/uniquePhone');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const autoIdGenerator = require("../middlewares/autoIdGenerator");
 
 /**
  * @openapi
@@ -55,29 +50,22 @@ const checkPhone = require('../middlewares/uniquePhone');
 
 const CustomerSchema = new mongoose.Schema(
   {
-    name: Joi.string().pattern(new RegExp('^[a-zA-Z]{3,30}$')),
-    email: Joi.string()
-      .required()
-      .trim()
-      .lowercase()
-      .external(checkEmail)
-      .email(),
-    contactNo: Joi.number().max(10).min(10).external(checkPhone),
-    password: Joi.string().required(),
-    CIF_No: Joi.string().alphanum(),
-    isActive: Joi.string()
-      .valid('active', 'deactive', 'blocked', 'notVarified')
-      .default('notVarified'),
-    createdAt: Joi.date().default(Date.now()),
+    name: String,
+    email: String,
+    contactNo: String,
+    password: String,
+    CIF_No: String,
+    isActive: String,
+    createdAt: Date,
   },
   { timestamps: true }
 );
-CustomerSchema.pre('create', async function () {
+CustomerSchema.pre("save", async function () {
   const salt = await bcrypt.genSalt(Number(process.env.SECRET_KEY));
   this.password = await bcrypt.hash(this.password, salt);
   this.CIF_No = await autoIdGenerator();
 });
-CustomerSchema.pre('findByIdAndUpdate', async function () {
+CustomerSchema.pre("findByIdAndUpdate", async function () {
   const salt = await bcrypt.genSalt(Number(process.env.SECRET_KEY));
   this.password = await bcrypt.hash(this.password, salt);
 });
@@ -93,4 +81,4 @@ CustomerSchema.methods.comparePassword = async function (canditatePassword) {
   return isMatch;
 };
 
-module.exports = mongoose.model('Customer', CustomerSchema);
+module.exports = mongoose.model("Customer", CustomerSchema);

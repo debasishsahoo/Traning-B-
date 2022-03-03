@@ -1,30 +1,18 @@
 const mongoose = require("mongoose");
-const Joi = require("joi");
-const AutoId = require("../middlewares/autoIdGenerator");
-const checkAccount = require("../middlewares/uniqueAccountNumber");
 
 let AccountSchema = mongoose.Schema(
   {
-    CIF_No: { type: String, ref: 'Customer' },
+    CIF_No: String,
 
-    accountNumber: Joi.string().external(checkAccount),
+    accountNumber: String,
 
-    IFSC: Joi.string().alphanum().default("B0001"),
+    IFSC: String,
 
-    accountBalance: Joi.number(),
+    accountBalance: Number,
 
-    accoutType: Joi.string()
-      .valid(
-        "savings",
-        "current",
-        "salary",
-        "fixed_deposit",
-        "recurring_deposit",
-        "nri"
-      )
-      .default("savings"),
+    accoutType: String,
 
-    createdAt: Joi.date().default(Date.now()),
+    createdAt: Date,
   },
   { timestamp: true }
 );
