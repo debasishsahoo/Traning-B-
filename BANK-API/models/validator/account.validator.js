@@ -1,11 +1,8 @@
 const Joi = require("joi");
-const AutoId = require("../middlewares/autoIdGenerator");
-const checkAccount = require("../middlewares/uniqueAccountNumber");
-
 const authScheme = Joi.object({
   CIF_No: Joi.string().alphanum(),
 
-  accountNumber: Joi.string().external(checkAccount),
+  accountNumber: Joi.string(),
 
   IFSC: Joi.string().alphanum().default("B0001"),
 
