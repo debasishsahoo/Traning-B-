@@ -15,9 +15,15 @@ const { StatusCodes } = require('http-status-codes');
 
 const GetAllCustomer = async (req, res) => {
   const customers = await Customer.find({}).sort('-createdAt');
+
+
+
   if (customers.length === 0) {
     throw new NotFoundError(`No Data Found`);
   }
+
+
+  
   res.status(StatusCodes.OK).json({
     success: true,
     count: customers.length,

@@ -1,4 +1,4 @@
-const mathOperations = require('./calculator');
+//const mathOperations = require('./calculator');
 
 describe('Calculator tests', () => {
     // test('adding 1+2 should return 3', () => {
@@ -73,34 +73,46 @@ describe('Calculator tests', () => {
     // });
 
     //! JSET HOOK
-    let input1 = 0;
-    let input2 = 0;
-    beforeAll(() => {
-        console.log('Before All Calling');
-    })
+    // let input1 = 0;
+    // let input2 = 0;
+    // beforeAll(() => {
+    //     console.log('Before All Calling');
+    // })
 
-    afterAll(() => {
-        console.log('After All Calling');
-    })
-    beforeEach(() => {
-        console.log('before Each Calling');
-        input1 = 1;
-        input2 = 2;
-    })
-    afterEach(() => {
-        console.log('after Each Calling');
-    })
-    test('adding 1+2 should return 3', () => {
-        const result = mathOperations.sum(input1, input2)
-        expect(result).toBe(3)
-    })
-    test('Subtracting 2 from 10 should rerurn 8', () => {
-        const result = mathOperations.diff(input1, input2)
-        expect(result).toBe(-1);
+    // afterAll(() => {
+    //     console.log('After All Calling');
+    // })
+    // beforeEach(() => {
+    //     console.log('before Each Calling');
+    //     input1 = 1;
+    //     input2 = 2;
+    // })
+    // afterEach(() => {
+    //     console.log('after Each Calling');
+    // })
+    // test('adding 1+2 should return 3', () => {
+    //     const result = mathOperations.sum(input1, input2)
+    //     expect(result).toBe(3)
+    // })
+    // test('Subtracting 2 from 10 should rerurn 8', () => {
+    //     const result = mathOperations.diff(input1, input2)
+    //     expect(result).toBe(-1);
+    // });
+    // test('Multiplying 2 and 8 Should return 16', () => {
+    //     const result = mathOperations.product(input1, input2)
+    //     expect(result).toBe(2);
+    // });
+
+    //! Array and iterables
+    const LanguageList = [
+        'C#', 'C', 'C++', 'JAVA', 'PYTHON', 'JAVA', 'RUBY'
+    ]
+    test('the Language list has JAVA on it', () => {
+        //     constexpect(LanguageList).toContain('JAVA');
+        expect(new Set(LanguageList)).toContain('JAVA')
     });
-    test('Multiplying 2 and 8 Should return 16', () => {
-        const result = mathOperations.product(input1, input2)
-        expect(result).toBe(2);
-    });
+
+
+
 
 })
